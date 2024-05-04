@@ -71,18 +71,30 @@ const createWindow = async () => {
 
     mainWindow = new BrowserWindow({
         show: false,
+
+        // Width
         width: 1024,
-        height: 728,
-        maximizable: true,
-        minimizable: true,
-        fullscreenable: true,
-        resizable: true,
+        maxWidth: 1024,
+        minWidth: 1024,
+
+        // Height
+        height: 500,
+        maxHeight: 500,
+        minHeight: 500,
+
+        maximizable: false,
+        minimizable: false,
+        fullscreenable: false,
+        resizable: false,
+        frame: false,
+
         icon: getAssetPath('icon.png'),
         webPreferences: {
             preload: app.isPackaged
                 ? path.join(__dirname, 'preload.js')
                 : path.join(__dirname, '../../.erb/dll/preload.js'),
             nodeIntegration: true,
+            contextIsolation: false
         },
     })
 
@@ -139,3 +151,6 @@ app.whenReady()
         })
     })
     .catch(console.log)
+
+// Custom IPC handlers
+ipcMain.on('close-app', () => app.quit())

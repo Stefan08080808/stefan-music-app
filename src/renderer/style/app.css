@@ -1,0 +1,22 @@
+@font-face {
+    src: url('../font/Corporate\ A\ Bold.otf');
+    font-family: 'Mercedes-Benz Bold';
+}
+
+@font-face {
+    font-family: 'Mercedes-Benz Light';
+    src: url('../font/Corporate\ A\ Light.ttf');
+}
+
+body {
+    font-family: 'Mercedes-Benz Bold';
+    color: #ab8254;
+    user-select: none;
+    margin: 0;
+}
+
+#content {
+    height: 320px;
+    width: 100%;
+    background-color: black;
+}

@@ -1,20 +1,16 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import './App.css';
+import { MemoryRouter as Router, Routes, Route } from 'react-router-dom'
 
-function Hello() {
-  return (
-    <div>
-      <h1>Hello!</h1>
-    </div>
-  )
-}
+import Nav from './interface/nav'
+import Footer from './interface/foo'
+
+import './style/app.css'
 
 export default function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Hello />} />
-      </Routes>
-    </Router>
-  )
+    return (
+        <div>
+            <Nav />
+            <div id='content' />
+            <Footer />
+        </div>
+    )
 }
