@@ -25,12 +25,6 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null
 
-ipcMain.on('ipc-example', async (event, arg) => {
-    const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`
-    console.log(msgTemplate(arg))
-    event.reply('ipc-example', msgTemplate('pong'))
-})
-
 if (process.env.NODE_ENV === 'production') {
     const sourceMapSupport = require('source-map-support')
     sourceMapSupport.install()
@@ -83,7 +77,7 @@ const createWindow = async () => {
         minHeight: 500,
 
         maximizable: false,
-        minimizable: false,
+        minimizable: true,
         fullscreenable: false,
         resizable: false,
         frame: false,
@@ -94,7 +88,7 @@ const createWindow = async () => {
                 ? path.join(__dirname, 'preload.js')
                 : path.join(__dirname, '../../.erb/dll/preload.js'),
             nodeIntegration: true,
-            contextIsolation: false
+            contextIsolation: true
         },
     })
 
@@ -153,4 +147,5 @@ app.whenReady()
     .catch(console.log)
 
 // Custom IPC handlers
-ipcMain.on('close-app', () => app.quit())
+ipcMain.on('closeApp', () => app.quit())
+ipcMain.on('minimiseApp', () => mainWindow?.minimize())
