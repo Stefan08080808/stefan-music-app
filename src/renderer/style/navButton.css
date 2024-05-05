@@ -1,0 +1,14 @@
+.tabName {
+    margin: 6px 63px;
+    flex: 1;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    font-family: sans-serif;
+}
+
+.tabName:hover {
+    cursor: pointer;
+}

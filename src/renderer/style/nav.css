@@ -37,6 +37,7 @@
     background-color: black;
     display: flex;
     -webkit-app-region: drag;
+    font-family: sans-serif;
 }
 
 #time {
@@ -57,5 +58,7 @@
 #bottom {
     height: 60px;
     width: 100%;
-    background-color: #1c1c1c;
+    background-color: #0c0c0c;
+    display: flex;
+    justify-content: space-evenly;
 }
