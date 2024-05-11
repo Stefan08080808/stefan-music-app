@@ -1,7 +1,6 @@
-import { useState } from 'react'
 import '../style/navButton.css'
 
-export type Tabs = 'Menu' | 'Audio' | 'Online' | 'Video' | 'System' | 'None'
+export type Tabs = 'Menu' | 'Audio' | 'Online' | 'Video' | 'System'
 
 export default function NavButton(props: { tabName: string, value: Tabs, selectedTab: Tabs, onSelectTab: (tab: Tabs) => void }) {
     return (
