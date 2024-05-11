@@ -15,9 +15,11 @@ export default function App() {
     const [selectedTab, setSelectedTab] = useState<Tabs>('Menu')
 
     return (
-        <div>
-            <Nav selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
-            <Content selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
-        </div>
+        <>
+            <div style={{ maxWidth: '1024px' }}>
+                <Nav selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
+                <Content selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
+            </div>
+        </>
     )
 }

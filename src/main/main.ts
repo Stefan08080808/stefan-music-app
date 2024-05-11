@@ -79,7 +79,7 @@ const createWindow = async () => {
         maximizable: false,
         minimizable: true,
         fullscreenable: false,
-        resizable: true,
+        resizable: false,
         frame: false,
 
         icon: getAssetPath('icon.png'),
@@ -149,3 +149,21 @@ app.whenReady()
 // Custom IPC handlers
 ipcMain.on('closeApp', () => app.quit())
 ipcMain.on('minimiseApp', () => mainWindow?.minimize())
+
+ipcMain.on('expandAppView', () => {
+    const mainWindow = BrowserWindow.getFocusedWindow()
+    if (!mainWindow) return
+
+    mainWindow.resizable = true
+    mainWindow.setSize(1400, 500, true)
+    mainWindow.resizable = false
+})
+
+ipcMain.on('retractAppView', () => {
+    const mainWindow = BrowserWindow.getFocusedWindow()
+    if (!mainWindow) return
+
+    mainWindow.resizable = true
+    mainWindow.setSize(1024, 500, true)
+    mainWindow.resizable = false
+})

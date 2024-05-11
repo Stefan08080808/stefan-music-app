@@ -36,6 +36,14 @@ export default function Nav(props: { selectedTab: Tabs, setSelectedTab: (tab: Ta
     const closeApp = () => window.electron.ipcRenderer.sendMessage('closeApp')
     const minimiseApp = () => window.electron.ipcRenderer.sendMessage('minimiseApp')
 
+    let hasExpanded = false
+    const expandAppView = () => {
+        if (!hasExpanded) window.electron.ipcRenderer.sendMessage('expandAppView')
+        else window.electron.ipcRenderer.sendMessage('retractAppView')
+        hasExpanded = !hasExpanded
+        console.log(hasExpanded)
+    }
+
     return (
         <div id='nav'>
             {/* Top Section */}
@@ -47,6 +55,7 @@ export default function Nav(props: { selectedTab: Tabs, setSelectedTab: (tab: Ta
                 </div>
 
                 {/* Exit Button Section */}
+                <p id='exitButton' onClick={expandAppView}>{'>'}</p>
                 <p id='exitButton' onClick={minimiseApp}>_</p>
                 <p id='exitButton' onClick={closeApp}>X</p>
             </div>
