@@ -7,7 +7,7 @@ const root = createRoot(container)
 root.render(<App />)
 
 declare global {
-  interface Window {
-    electron: ElectronHandler
-  }
+    interface Window {
+        electron: ElectronHandler
+    }
 }
