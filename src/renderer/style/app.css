@@ -13,4 +13,9 @@ body {
     color: #ab8254;
     user-select: none;
     margin: 0;
+    background-color: black;
+}
+
+body {
+    width: 800px;
 }

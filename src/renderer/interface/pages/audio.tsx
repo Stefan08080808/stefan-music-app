@@ -1,5 +1,6 @@
-import Footer from '../foo'
+import FooterButton from '../footerButton'
 import '../../style/content.css'
+import '../../style/foo.css'
 
 export default function Audio() {
     return (
@@ -7,7 +8,12 @@ export default function Audio() {
             <div className='main'>
                 Audio
             </div>
-            <Footer />
+            <div id='footer' >
+                <FooterButton value='MP3' />
+                <FooterButton value='Folder' />
+                <FooterButton value='Media' />
+                <FooterButton value='Sound' />
+            </div>
         </div>
     )
 }

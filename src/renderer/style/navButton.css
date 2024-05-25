@@ -1,14 +1,18 @@
 .tabName {
-    margin: 6px 63px;
+    margin: 6px 40px;
     flex: 1;
-    height: 48px;
+    height: 30px;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 28px;
-    font-family: sans-serif;
+    font-family: Arial;
 }
 
-.tabName:hover {
+.navButton:hover {
     cursor: pointer;
+    background-color: #262626;
+    height: 40px;
+    border-bottom: 5px solid rgb(255, 60, 0);
+    box-shadow: 0px 1px 100px rgb(50, 50, 50);
 }

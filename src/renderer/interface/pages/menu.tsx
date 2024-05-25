@@ -1,5 +1,6 @@
-import Footer from '../foo'
+import FooterButton from '../footerButton'
 import '../../style/content.css'
+import '../../style/foo.css'
 
 export default function Menu() {
     return (
@@ -7,7 +8,9 @@ export default function Menu() {
             <div className='main'>
                 Menu
             </div>
-            <Footer />
+            <div id='footer'>
+                <FooterButton value='Main Menu' />
+            </div>
         </div>
     )
 }

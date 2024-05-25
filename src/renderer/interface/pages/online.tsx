@@ -1,5 +1,6 @@
-import Footer from '../foo'
+import FooterButton from '../footerButton'
 import '../../style/content.css'
+import '../../style/foo.css'
 
 export default function Online() {
     return (
@@ -7,7 +8,11 @@ export default function Online() {
             <div className='main'>
                 Online
             </div>
-            <Footer />
+            <div id='footer'>
+                <FooterButton value='Files' />
+                <FooterButton value='Service' />
+                <FooterButton value='Transfer' />
+            </div>
         </div>
     )
 }
