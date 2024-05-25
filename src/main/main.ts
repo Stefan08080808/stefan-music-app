@@ -67,14 +67,14 @@ const createWindow = async () => {
         show: false,
 
         // Width
-        width: 1024,
-        maxWidth: 1400,
-        minWidth: 1024,
+        width: 800,
+        maxWidth: 800,
+        minWidth: 800,
 
         // Height
-        height: 500,
-        maxHeight: 500,
-        minHeight: 500,
+        height: 470,
+        maxHeight: 470,
+        minHeight: 470,
 
         maximizable: false,
         minimizable: true,
@@ -149,21 +149,3 @@ app.whenReady()
 // Custom IPC handlers
 ipcMain.on('closeApp', () => app.quit())
 ipcMain.on('minimiseApp', () => mainWindow?.minimize())
-
-ipcMain.on('expandAppView', () => {
-    const mainWindow = BrowserWindow.getFocusedWindow()
-    if (!mainWindow) return
-
-    mainWindow.resizable = true
-    mainWindow.setSize(1400, 500, true)
-    mainWindow.resizable = false
-})
-
-ipcMain.on('retractAppView', () => {
-    const mainWindow = BrowserWindow.getFocusedWindow()
-    if (!mainWindow) return
-
-    mainWindow.resizable = true
-    mainWindow.setSize(1024, 500, true)
-    mainWindow.resizable = false
-})
