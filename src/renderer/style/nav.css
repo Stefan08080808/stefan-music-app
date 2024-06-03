@@ -31,6 +31,14 @@
     padding: 0px;
 }
 
+#nav .navButton {
+    color: #777069;
+}
+
+#nav:hover .navButton:hover>p {
+    color: #ab8254;
+}
+
 #timeContainer {
     height: 55px;
     width: 100%;

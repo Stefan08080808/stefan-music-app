@@ -8,12 +8,12 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import path from 'path'
-import { app, BrowserWindow, shell, ipcMain } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron'
 import { autoUpdater } from 'electron-updater'
-import log from 'electron-log'
-import MenuBuilder from './menu'
 import { resolveHtmlPath } from './util'
+import log from 'electron-log'
+import path from 'path'
+import fs from 'fs'
 
 class AppUpdater {
     constructor() {
@@ -88,7 +88,8 @@ const createWindow = async () => {
                 ? path.join(__dirname, 'preload.js')
                 : path.join(__dirname, '../../.erb/dll/preload.js'),
             nodeIntegration: true,
-            contextIsolation: true
+            contextIsolation: true,
+            // webSecurity: false,
         },
     })
 
@@ -149,3 +150,20 @@ app.whenReady()
 // Custom IPC handlers
 ipcMain.on('closeApp', () => app.quit())
 ipcMain.on('minimiseApp', () => mainWindow?.minimize())
+
+const appDataFolder = app.getPath('appData')
+ipcMain.handle('getMusicFiles', () => {
+    const files = fs.readdirSync(`${appDataFolder}\\Stefan Music App`)
+    return files
+})
+
+ipcMain.handle('getMusicData', async (event, song) => {
+    try {
+        const data = await fs.promises.readFile(`${appDataFolder}\\Stefan Music App\\${song}`)
+        const base64Data = data.toString('base64')
+        return base64Data
+    } catch (error) {
+        console.error('Error reading music file:', error)
+        return null // Return an appropriate value (e.g., null) in case of an error
+    }
+})

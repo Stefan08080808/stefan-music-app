@@ -19,3 +19,8 @@ body {
 body {
     width: 800px;
 }
+
+hr {
+    border: #ab8254 1px solid;
+    width: 95%;
+}

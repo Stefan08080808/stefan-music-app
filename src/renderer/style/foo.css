@@ -10,8 +10,17 @@
     border-bottom: 5px solid white;
 }
 
+#footer .footerButton {
+    color: #777069;
+}
+
+#footer:hover .footerButton:hover {
+    color: #ab8254;
+}
+
 .footerButton {
     width: auto;
+    max-width: 50%;
     height: 45px;
     flex-grow: 1;
 

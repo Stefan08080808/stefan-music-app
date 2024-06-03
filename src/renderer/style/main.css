@@ -1,0 +1,8 @@
+.main p {
+    margin: 0;
+    margin-left: 10px;
+}
+
+.main p:nth-of-type(1) {
+    margin-top: 10px;
+}
