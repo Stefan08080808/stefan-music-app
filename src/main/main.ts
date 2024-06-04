@@ -72,9 +72,9 @@ const createWindow = async () => {
         minWidth: 800,
 
         // Height
-        height: 470,
-        maxHeight: 470,
-        minHeight: 470,
+        height: 400,
+        maxHeight: 400,
+        minHeight: 400,
 
         maximizable: false,
         minimizable: true,

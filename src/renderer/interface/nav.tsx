@@ -1,11 +1,18 @@
+// React
 import { useState, useEffect } from 'react'
 
-import NavButton, { Tabs } from './navButton'
+// Components
+import NavButton from './navButton'
 
+// CSS
 import '../style/nav.css'
 
+// Utils
 import updateTimeUtil from './util/updateTimeUtil'
 import navScrollUtil from './util/navScrollUtil'
+
+// Types
+import { Tabs } from '../types/Tabs'
 
 export default function Nav(props: { selectedTab: Tabs, setSelectedTab: (tab: Tabs) => void }) {
     // Time Logic

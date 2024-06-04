@@ -1,0 +1,1 @@
+export type Tabs = 'Menu' | 'Audio' | 'Online' | 'Video' | 'System'

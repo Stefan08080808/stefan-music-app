@@ -9,8 +9,6 @@ export default function System() {
             </div>
             <div id='footer'>
                 <FooterButton value='Settings' />
-                <FooterButton value='Import/Export' />
-                <FooterButton value='Help' />
             </div>
         </div>
     )

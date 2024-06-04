@@ -1,18 +1,21 @@
+// React
 import React, { useState } from 'react'
-import { Tabs } from './navButton'
 
+// Components
 import Menu from './pages/menu'
 import Audio from './pages/audio'
 import Online from './pages/online'
 import Video from './pages/video'
 import System from './pages/system'
 
+// Types
+import { Tabs } from '../types/Tabs'
+
 export default function Content(props: { selectedTab: Tabs, setSelectedTab: (tab: Tabs) => void }) {
     const [loadedTabs, setLoadedTabs] = useState<{ [key in Tabs]?: boolean }>({
-        Menu: true, // Assume the initial tab is Menu and it's loaded
+        Menu: true
     })
 
-    // Update the state to mark the tab as loaded when it's selected
     if (!loadedTabs[props.selectedTab]) {
         setLoadedTabs(prev => ({ ...prev, [props.selectedTab]: true }))
     }

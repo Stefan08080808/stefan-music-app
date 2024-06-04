@@ -1,6 +1,8 @@
+// CSS
 import '../style/navButton.css'
 
-export type Tabs = 'Menu' | 'Audio' | 'Online' | 'Video' | 'System'
+// Types
+import { Tabs } from '../types/Tabs'
 
 export default function NavButton(props: { tabName: string, value: Tabs, selectedTab: Tabs, onSelectTab: (tab: Tabs) => void }) {
     return (
