@@ -21,8 +21,9 @@ const electronHandler = {
         once(channel: Channels, func: (...args: unknown[]) => void) {
             ipcRenderer.once(channel, (_event, ...args) => func(...args))
         },
-        getMusicFiles: () => ipcRenderer.invoke('getMusicFiles'),
-        getMusicData: (song: string) => ipcRenderer.invoke('getMusicData', song),
+        getMusicFiles: (location: 'AppData' | 'Music') => ipcRenderer.invoke('getMusicFiles', location),
+        getMusicData: (song: string, location: 'AppData' | 'Music') => ipcRenderer.invoke('getMusicData', song, location),
+        openExplorer: (location: 'AppData' | 'Music') => ipcRenderer.invoke('openExplorer', location),
     },
 }
 

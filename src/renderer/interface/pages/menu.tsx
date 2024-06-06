@@ -1,4 +1,5 @@
 import FooterButton from '../footerButton'
+
 import '../../style/main.css'
 import '../../style/content.css'
 import '../../style/foo.css'

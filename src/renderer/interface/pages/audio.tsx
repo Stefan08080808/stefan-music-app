@@ -2,11 +2,14 @@
 import { useEffect, useState } from 'react'
 
 // Components
+import MiniSelectorMenu from '../miniSelectorMenu'
 import FooterButton from '../footerButton'
+import Spinner from '../spinner'
 import Player from '../player'
 
 // CSS
 import '../../style/content.css'
+import '../../style/audio.css'
 import '../../style/foo.css'
 
 // Utils
@@ -14,6 +17,7 @@ import formatPlayerTime from '../util/formatPlayerTime'
 
 // Types
 import { Range0To100 } from '../../types/Range'
+import { PlayerMedium } from '../../types/Medium'
 
 export default function Audio() {
     // Music States
@@ -22,19 +26,38 @@ export default function Audio() {
     const [songIndex, setSongIndex] = useState<number>(0)
     const [songProgressString, setSongProgressString] = useState<string>('00:00')
     const [songProgressInteger, setSongProgressInteger] = useState<Range0To100>(0)
+    const [song, setSong] = useState<string>('')
 
     // Scrolling States
     const [isHoveringOnMain, setIsHoveringOnMain] = useState<boolean>(false)
     const [isReady, setIsReady] = useState<boolean>(false)
     const [isScrolling, setIsScrolling] = useState<boolean>(false)
 
+    // Music Register Location States
+    const [medium, setMedium] = useState<PlayerMedium>(localStorage.getItem('musicSrc')! as PlayerMedium)
+
+    // Mini Selector Menu States
+    const [isMediaMenuOpen, setIsMediaMenuOpen] = useState<boolean>(false)
+    const [isMP3MenuOpen, setIsMP3MenuOpen] = useState<boolean>(false)
+
+    // Loading State
+    const [isLoading, setIsLoading] = useState<boolean>(false)
+
+    useEffect(() => {
+        const medium: PlayerMedium | string = localStorage.getItem('musicSrc')!
+
+        if ((medium as PlayerMedium) !== 'AppData'
+            && (medium as PlayerMedium) !== 'Music') {
+            localStorage.setItem('musicSrc', 'AppData')
+        }
+    }, [])
+
     /**
      * Fetches all music files from the main process and sets them in the state
-     * @returns {Promise<void>}
      */
     const fetchMusicFiles = () => {
         return new Promise((resolve, reject) => {
-            window.electron.ipcRenderer.getMusicFiles()
+            window.electron.ipcRenderer.getMusicFiles(medium)
                 .then(songs => {
                     const constructedSongPaths = songs.map((song: string) => song)
 
@@ -69,7 +92,7 @@ export default function Audio() {
             if (!isReady || musicFiles.length === 0) return
 
             try {
-                const data = await window.electron.ipcRenderer.getMusicData(musicFiles[songIndex])
+                const data = await window.electron.ipcRenderer.getMusicData(musicFiles[songIndex], medium)
                 audio.src = `data:audio/ogg;base64,${data}`
                 addAudioEventListeners()
             } catch (error) {
@@ -136,13 +159,34 @@ export default function Audio() {
         document.addEventListener('keydown', onKeyDown)
     }, [])
 
+    const openExplorer = () => {
+        window.electron.ipcRenderer.openExplorer(medium)
+    }
+
+    const changeMusic = async () => {
+        setIsLoading(true)
+        setSongIndex(0)
+        fetchMusicFiles()
+        setTimeout(() => setIsLoading(false), 1000)
+    }
+
+    useEffect(() => {
+        changeMusic()
+        localStorage.setItem('musicSrc', medium)
+    }, [medium])
+
+    useEffect(() => {
+        console.log(song)
+        setSongIndex(musicFiles.indexOf(song))
+    }, [song])
+
     return (
         <div className='content'>
             <div className='main' onMouseOver={() => setIsHoveringOnMain(true)} onMouseLeave={() => setIsHoveringOnMain(false)}>
                 {isReady && musicFiles.length > 0 && ( // Conditional rendering based on isReady and musicFiles length
                     <Player
                         song={musicFiles[songIndex]?.slice(0, -4)}
-                        medium='MP3 Register'
+                        medium={medium}
                         songCount={songCount}
                         songIndex={songIndex}
                         songProgessString={songProgressString}
@@ -154,12 +198,35 @@ export default function Audio() {
                 )}
             </div>
             <div id='footer'>
-                <FooterButton value='MP3' />
-                <FooterButton value='Folder' />
-                <FooterButton value='Media' />
+                <FooterButton value='MP3' onClick={() => setIsMP3MenuOpen(true)} />
+                <FooterButton value='Folder' onClick={openExplorer} />
+                <FooterButton value='Media' onClick={() => setIsMediaMenuOpen(true)} />
                 <FooterButton value='Sound' />
             </div>
             <audio src='' controls id='player'></audio>
+
+            {isMediaMenuOpen && (
+                <MiniSelectorMenu X={391} Y={0} W={201} H={400}
+                    options={['AppData', 'Music']} returnValue={setMedium}
+                    setIsMenuOpen={setIsMediaMenuOpen} />
+            )}
+
+            {isMP3MenuOpen && (
+                <MiniSelectorMenu X={20} Y={60} W={750} H={290}
+                    options={musicFiles} returnValue={setSong}
+                    setIsMenuOpen={setIsMP3MenuOpen} />
+            )}
+
+            {isLoading && (
+                <div className='loading'>
+                    <div>
+                        <h1>Loading...</h1>
+                        <div className='spinnerContainer'>
+                            <Spinner />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

@@ -152,18 +152,44 @@ ipcMain.on('closeApp', () => app.quit())
 ipcMain.on('minimiseApp', () => mainWindow?.minimize())
 
 const appDataFolder = app.getPath('appData')
-ipcMain.handle('getMusicFiles', () => {
-    const files = fs.readdirSync(`${appDataFolder}\\Stefan Music App`)
-    return files
+const musicFolder = app.getPath('music')
+
+ipcMain.handle('getMusicFiles', (_, location: 'AppData' | 'Music') => {
+    if (location === 'AppData') {
+        return fs.readdirSync(`${appDataFolder}\\Stefan Music App`)
+    } else if (location === 'Music') {
+        return fs.readdirSync(musicFolder)
+    } else {
+        throw new Error('Invalid location')
+    }
 })
 
-ipcMain.handle('getMusicData', async (event, song) => {
+ipcMain.handle('getMusicData', async (_, song, location) => {
     try {
-        const data = await fs.promises.readFile(`${appDataFolder}\\Stefan Music App\\${song}`)
-        const base64Data = data.toString('base64')
+        let data = null
+        if (location === 'AppData') {
+            data = await fs.promises.readFile(`${appDataFolder}\\Stefan Music App\\${song}`)
+        } else if (location === 'Music') {
+            data = await fs.promises.readFile(`${musicFolder}\\${song}`)
+        }
+        const base64Data = data!.toString('base64')
         return base64Data
     } catch (error) {
         console.error('Error reading music file:', error)
-        return null // Return an appropriate value (e.g., null) in case of an error
+        return null
     }
 })
+
+ipcMain.handle('openExplorer', (_, location: 'AppData' | 'Music') => {
+    if (location === 'AppData') {
+        shell.openPath(`${appDataFolder}\\Stefan Music App\\`)
+    } else if (location === 'Music') {
+        shell.openPath(`${musicFolder}\\`)
+    } else {
+        throw new Error('Invalid location')
+    }
+})
+
+if (fs.readdirSync(appDataFolder).includes('Stefan Music App') === false) {
+    fs.mkdirSync(`${appDataFolder}\\Stefan Music App`)
+}

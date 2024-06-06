@@ -8,6 +8,10 @@
     src: url('../font/Corporate\ A\ Light.ttf');
 }
 
+* {
+    color-scheme: dark;
+}
+
 body {
     font-family: 'Mercedes-Benz Bold';
     color: #ab8254;

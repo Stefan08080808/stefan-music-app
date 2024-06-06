@@ -9,6 +9,7 @@ import '../style/player.css'
 
 // Types
 import { Range0To100 } from '../types/Range'
+import { PlayerMedium } from '../types/Medium'
 
 /**
  * The main Player Element with the slithers, progress bar,
@@ -30,7 +31,7 @@ export default function Player(props: {
     setIsScrolling: (value: boolean) => void
 
     // Storage Medium
-    medium: string
+    medium: PlayerMedium
 }) {
     // Redecleration of props for cleaner look
     const song = props.song
@@ -54,16 +55,13 @@ export default function Player(props: {
      * @param index The index of the slither that should be active
      */
     const setActiveSlither = (index: number) => {
-        const slithers = document.querySelectorAll('.slither')
+        const slithers = slithersContainerRef.current?.querySelectorAll('.slither')
 
-        if (slithers.length > 0) {
-            slithers.forEach((slither: Element) =>
-                slither.classList.remove('selectedSlither'))
-
-            if (index >= 0 && index < slithers.length) {
-                slithers[index].classList.add('selectedSlither')
-                setSongIndex(index)
-            }
+        if (slithers) {
+            slithers.forEach((slither, slitherIndex) => {
+                slither.classList.toggle('selectedSlither', slitherIndex === index)
+            })
+            setSongIndex(index)
         }
     }
 
@@ -74,21 +72,32 @@ export default function Player(props: {
 
     // Create slithers
     useEffect(() => {
-        const slithersContainer = slithersContainerRef.current
+        const slithersContainer = slithersContainerRef.current as HTMLDivElement
 
-        if (slithersContainer && slithersContainer.children.length === 0) {
-            for (let i = 0; i < songCount; i++) {
+        // Function to create slithers
+        const createSlithers = () => {
+            // Create a new array of slither elements
+            const newSlithers = Array.from({ length: songCount }, (_, i) => {
                 const slither = document.createElement('div')
-
                 slither.setAttribute('class', 'slither')
                 slither.addEventListener('click', () => setActiveSlither(i))
+                return slither
+            })
 
-                slithersContainer.appendChild(slither)
-            }
+            // Clear the container and append the new slithers
+            slithersContainer.innerHTML = ''
+            newSlithers.forEach(slither => slithersContainer.appendChild(slither))
 
+            // Set active slither
             setActiveSlither(songIndex)
         }
+
+        // Call createSlithers function
+        if (slithersContainer) {
+            createSlithers()
+        }
     }, [songCount, songIndex])
+
 
     /**
      * Scrolls the player when the user scrolls the mouse wheel

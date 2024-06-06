@@ -83,6 +83,7 @@
     background-color: white;
     margin-top: 10px;
     margin-left: 4px;
+    max-width: 3px;
     /* Adjust this value to control spacing between slithers */
 }
 
