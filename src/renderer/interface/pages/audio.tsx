@@ -1,5 +1,5 @@
 // React
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 // Components
 import MiniSelectorMenu from '../miniSelectorMenu'
@@ -39,9 +39,18 @@ export default function Audio() {
     // Mini Selector Menu States
     const [isMediaMenuOpen, setIsMediaMenuOpen] = useState<boolean>(false)
     const [isMP3MenuOpen, setIsMP3MenuOpen] = useState<boolean>(false)
+    const [isSoundMenuOpen, setIsSoundMenuOpen] = useState<boolean>(false)
 
     // Loading State
     const [isLoading, setIsLoading] = useState<boolean>(false)
+
+    // References
+    const audioRef = useRef<HTMLAudioElement>(null)
+    const latestRequestedSongIndex = useRef<number>(0)
+
+    // Sound Settings
+    const [bass, setBass] = useState<number>(0)
+    const [treble, setTreble] = useState<number>(0)
 
     useEffect(() => {
         const medium: PlayerMedium | string = localStorage.getItem('musicSrc')!
@@ -63,6 +72,7 @@ export default function Audio() {
 
                     setMusicFiles(constructedSongPaths)
                     setSongCount(songs.length)
+                    setSongIndex(0)
 
                     setTimeout(() => {
                         setIsReady(true)
@@ -92,11 +102,18 @@ export default function Audio() {
             if (!isReady || musicFiles.length === 0) return
 
             try {
+                // Store the latest requested song index
+                latestRequestedSongIndex.current = songIndex
+
+                // Load data for the current song index
                 const data = await window.electron.ipcRenderer.getMusicData(musicFiles[songIndex], medium)
-                audio.src = `data:audio/ogg;base64,${data}`
-                addAudioEventListeners()
+
+                // Check if the latest requested song index has changed
+                if (latestRequestedSongIndex.current === songIndex) {
+                    audio.src = `data:audio/ogg;base64,${data}`
+                    addAudioEventListeners()
+                }
             } catch (error) {
-                console.error('Error loading music data:', error)
             }
         }
 
@@ -109,7 +126,7 @@ export default function Audio() {
             }, { once: true })
         }
 
-        let lastSecond = -1 // Initialize lastSecond to an invalid value
+        let lastSecond = 0 // Initialize lastSecond to an invalid value
         const initializeSongProgress = () => {
             audio.addEventListener('timeupdate', updateSongProgress)
         }
@@ -134,14 +151,23 @@ export default function Audio() {
     // Check if song has finished playing
     useEffect(() => {
         const audio = document.getElementById('player') as HTMLAudioElement
+        if (!audio) return
 
-        audio.addEventListener('ended', () => {
-            if (songIndex + 1 < songCount)
-                setSongIndex(songIndex + 1)
-            else
+        const handleSongEnd = () => {
+            if (songIndex >= songCount - 1) {
                 setSongIndex(0)
-        })
-    }, [])
+            } else {
+                setSongIndex(prevIndex => prevIndex + 1)
+            }
+        }
+
+        audio.addEventListener('ended', handleSongEnd)
+
+        return () => {
+            audio.removeEventListener('ended', handleSongEnd)
+        }
+    }, [songIndex, songCount])
+
 
     // use arrow keys to go forwards and backwards 5s in the song
     useEffect(() => {
@@ -161,11 +187,11 @@ export default function Audio() {
 
     const openExplorer = () => {
         window.electron.ipcRenderer.openExplorer(medium)
+        window.electron.ipcRenderer.on('refreshApp', () => window.location.reload())
     }
 
     const changeMusic = async () => {
         setIsLoading(true)
-        setSongIndex(0)
         fetchMusicFiles()
         setTimeout(() => setIsLoading(false), 1000)
     }
@@ -176,7 +202,6 @@ export default function Audio() {
     }, [medium])
 
     useEffect(() => {
-        console.log(song)
         setSongIndex(musicFiles.indexOf(song))
     }, [song])
 
@@ -201,9 +226,9 @@ export default function Audio() {
                 <FooterButton value='MP3' onClick={() => setIsMP3MenuOpen(true)} />
                 <FooterButton value='Folder' onClick={openExplorer} />
                 <FooterButton value='Media' onClick={() => setIsMediaMenuOpen(true)} />
-                <FooterButton value='Sound' />
+                <FooterButton value='Sound' onClick={() => setIsSoundMenuOpen(true)} />
             </div>
-            <audio src='' controls id='player'></audio>
+            <audio ref={audioRef} src='' controls id='player'></audio>
 
             {isMediaMenuOpen && (
                 <MiniSelectorMenu X={391} Y={0} W={201} H={400}
@@ -217,6 +242,40 @@ export default function Audio() {
                     setIsMenuOpen={setIsMP3MenuOpen} />
             )}
 
+            {isSoundMenuOpen && (
+                <div className='soundMenu'>
+                    <div className="main-soundMenu">
+                        <div className="setting-section">
+                            <p className='sm-label'>Bass</p>
+                            <p className='sm-value-label'>0</p>
+                            <div className='sm-button-container'>
+                                <button>-</button>
+                                <button>+</button>
+                            </div>
+                        </div>
+                        <div className="setting-section">
+                            <p className='sm-label'>Trebble</p>
+                            <p className='sm-value-label'>0</p>
+                            <div className='sm-button-container'>
+                                <button>-</button>
+                                <button>+</button>
+                            </div>
+                        </div>
+                        <div className="setting-section">
+                            <p className='sm-label'>Volume</p>
+                            <p className='sm-value-label'>0</p>
+                            <div className='sm-button-container'>
+                                <button>-</button>
+                                <button>+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="footer-soundMenu">
+                        <FooterButton value='Back' onClick={() => setIsSoundMenuOpen(false)} />
+                    </div>
+                </div>
+            )}
+
             {isLoading && (
                 <div className='loading'>
                     <div>
@@ -227,6 +286,8 @@ export default function Audio() {
                     </div>
                 </div>
             )}
+
+            {songCount === 0 && (<p className='noSongs'>No Data</p>)}
         </div>
     )
 }

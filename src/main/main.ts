@@ -8,7 +8,7 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron'
+import { app, BrowserWindow, shell, ipcMain } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import { resolveHtmlPath } from './util'
 import log from 'electron-log'
@@ -147,49 +147,55 @@ app.whenReady()
     })
     .catch(console.log)
 
-// Custom IPC handlers
+// Custom IPC Events
 ipcMain.on('closeApp', () => app.quit())
 ipcMain.on('minimiseApp', () => mainWindow?.minimize())
 
-const appDataFolder = app.getPath('appData')
+const appDataFolder = path.join(app.getPath('appData'), 'Stefan Music App')
 const musicFolder = app.getPath('music')
+const musicAppFolder = path.join(appDataFolder, 'Stefan Music App')
 
-ipcMain.handle('getMusicFiles', (_, location: 'AppData' | 'Music') => {
-    if (location === 'AppData') {
-        return fs.readdirSync(`${appDataFolder}\\Stefan Music App`)
-    } else if (location === 'Music') {
-        return fs.readdirSync(musicFolder)
-    } else {
-        throw new Error('Invalid location')
+const supportedFileTypes = ['.mp3', '.ogg', '.wav', '.m4a', '.aac', '.flac']
+
+const getMusicFilesFromFolder = (folderPath: string) => {
+    if (!fs.existsSync(folderPath)) return []
+    const files = fs.readdirSync(folderPath)
+    return files.filter(file => supportedFileTypes.includes(path.extname(file)))
+}
+
+ipcMain.handle('getMusicFiles', (_, location) => {
+    switch (location) {
+        case 'AppData':
+            return getMusicFilesFromFolder(musicAppFolder)
+        case 'Music':
+            return getMusicFilesFromFolder(musicFolder)
+        default:
+            throw new Error('Invalid location')
     }
 })
 
 ipcMain.handle('getMusicData', async (_, song, location) => {
+    console.log(song, location)
     try {
-        let data = null
-        if (location === 'AppData') {
-            data = await fs.promises.readFile(`${appDataFolder}\\Stefan Music App\\${song}`)
-        } else if (location === 'Music') {
-            data = await fs.promises.readFile(`${musicFolder}\\${song}`)
-        }
-        const base64Data = data!.toString('base64')
-        return base64Data
+        if (!song) throw new Error('Song is undefined')
+        const folderPath = location === 'AppData' ? musicAppFolder : musicFolder
+        const filePath = path.join(folderPath, song)
+        const data = await fs.promises.readFile(filePath)
+        return data.toString('base64')
     } catch (error) {
         console.error('Error reading music file:', error)
         return null
     }
 })
 
-ipcMain.handle('openExplorer', (_, location: 'AppData' | 'Music') => {
-    if (location === 'AppData') {
-        shell.openPath(`${appDataFolder}\\Stefan Music App\\`)
-    } else if (location === 'Music') {
-        shell.openPath(`${musicFolder}\\`)
-    } else {
-        throw new Error('Invalid location')
-    }
+ipcMain.handle('openExplorer', (_, location) => {
+    const folderPath = location === 'AppData' ? musicAppFolder : musicFolder
+    shell.openPath(folderPath)
+
+    const win = BrowserWindow.getFocusedWindow()
+    if (win) win.webContents.send('refreshApp')
 })
 
-if (fs.readdirSync(appDataFolder).includes('Stefan Music App') === false) {
-    fs.mkdirSync(`${appDataFolder}\\Stefan Music App`)
+if (!fs.existsSync(musicAppFolder)) {
+    fs.mkdirSync(musicAppFolder)
 }
