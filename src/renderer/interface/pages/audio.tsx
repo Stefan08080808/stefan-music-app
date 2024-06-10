@@ -14,10 +14,12 @@ import '../../style/foo.css'
 
 // Utils
 import formatPlayerTime from '../util/formatPlayerTime'
+import AudioComponent from '../util/AudioComponent'
 
 // Types
 import { Range0To100 } from '../../types/Range'
 import { PlayerMedium } from '../../types/Medium'
+import { SoundSettings } from '../../types/SoundSettings'
 
 export default function Audio() {
     // Music States
@@ -51,6 +53,18 @@ export default function Audio() {
     // Sound Settings
     const [bass, setBass] = useState<number>(0)
     const [treble, setTreble] = useState<number>(0)
+    const [volume, setVolume] = useState<number>(0)
+    const [initialLoadValue, setInitialLoadValue] = useState<boolean>(false)
+
+    useEffect(() => {
+        if (!localStorage.getItem('soundSettings'))
+            localStorage.setItem('soundSettings', JSON.stringify({ bass: 0, trebble: 0, volume: 100 }))
+
+        if (!localStorage.getItem('musicSrc')) {
+            localStorage.setItem('musicSrc', 'AppData' as PlayerMedium)
+            setMedium('AppData')
+        }
+    }, [])
 
     useEffect(() => {
         const medium: PlayerMedium | string = localStorage.getItem('musicSrc')!
@@ -205,6 +219,36 @@ export default function Audio() {
         setSongIndex(musicFiles.indexOf(song))
     }, [song])
 
+    // Regulate Bass/Trebble/Volume changes
+    useEffect(() => {
+        if (bass > 10) setBass(10)
+        else if (bass < -10) setBass(-10)
+
+        if (treble > 10) setTreble(10)
+        else if (treble < -10) setTreble(-10)
+
+        if (volume > 100) setVolume(100)
+        else if (volume < 0) setVolume(0)
+
+        if (initialLoadValue)
+            localStorage.setItem('soundSettings', JSON.stringify({ bass: bass, trebble: treble, volume: volume }))
+
+        console.log(JSON.parse(localStorage.getItem('soundSettings') as string))
+        setInitialLoadValue(true)
+    }, [bass, treble, volume])
+
+    // Get default values from LocalStorage
+    useEffect(() => {
+        const values: SoundSettings = JSON.parse(localStorage.getItem('soundSettings') as string)
+        console.log(values)
+
+        setBass(values.bass)
+        setTreble(values.trebble)
+        setVolume(values.volume === 0 ? 15 : values.volume)
+    }, [])
+
+    AudioComponent({ audioRef: audioRef, volume: volume, bass: bass, treble: treble })
+
     return (
         <div className='content'>
             <div className='main' onMouseOver={() => setIsHoveringOnMain(true)} onMouseLeave={() => setIsHoveringOnMain(false)}>
@@ -247,26 +291,26 @@ export default function Audio() {
                     <div className="main-soundMenu">
                         <div className="setting-section">
                             <p className='sm-label'>Bass</p>
-                            <p className='sm-value-label'>0</p>
+                            <p className='sm-value-label'>{bass}</p>
                             <div className='sm-button-container'>
-                                <button>-</button>
-                                <button>+</button>
+                                <button onClick={() => setBass(bass - 1)}>-</button>
+                                <button onClick={() => setBass(bass + 1)}>+</button>
                             </div>
                         </div>
                         <div className="setting-section">
                             <p className='sm-label'>Trebble</p>
-                            <p className='sm-value-label'>0</p>
+                            <p className='sm-value-label'>{treble}</p>
                             <div className='sm-button-container'>
-                                <button>-</button>
-                                <button>+</button>
+                                <button onClick={() => setTreble(treble - 1)}>-</button>
+                                <button onClick={() => setTreble(treble + 1)}>+</button>
                             </div>
                         </div>
                         <div className="setting-section">
                             <p className='sm-label'>Volume</p>
-                            <p className='sm-value-label'>0</p>
+                            <p className='sm-value-label'>{volume}</p>
                             <div className='sm-button-container'>
-                                <button>-</button>
-                                <button>+</button>
+                                <button onClick={() => setVolume(volume - 5)}>-</button>
+                                <button onClick={() => setVolume(volume + 5)}>+</button>
                             </div>
                         </div>
                     </div>

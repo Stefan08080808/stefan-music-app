@@ -12,8 +12,8 @@ node_modules
 
 .DS_Store
 
-release
-release/app
+# release
+# release/app
 .erb/dll
 
 .idea

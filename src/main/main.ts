@@ -151,7 +151,7 @@ app.whenReady()
 ipcMain.on('closeApp', () => app.quit())
 ipcMain.on('minimiseApp', () => mainWindow?.minimize())
 
-const appDataFolder = path.join(app.getPath('appData'), 'Stefan Music App')
+const appDataFolder = path.join(app.getPath('appData'))
 const musicFolder = app.getPath('music')
 const musicAppFolder = path.join(appDataFolder, 'Stefan Music App')
 
